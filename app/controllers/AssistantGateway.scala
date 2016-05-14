@@ -30,10 +30,10 @@ class AssistantGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materia
 
   override protected def settings = SockJSSettings()
 
-  def sockjs = SockJS.accept [Message, Message] { request =>
+  def sockjs = SockJS.accept [AssistantRequest, Message] { request =>
 
     // connect the websocket. All processing and error reporting is done inside the UserConnection actor
-    ActorFlow.actorRef[Message, Message]( AssistantConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
+    ActorFlow.actorRef[AssistantRequest, Message]( AssistantConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
 
   }
 

@@ -164,14 +164,27 @@ object SocksMessages {
   case class AssistantPing( created:Date = new Date() ) extends Message with AssistantRequest
   case class Pong( created:Date = new Date() ) extends Message with Response
 
-  implicit val messageFormat = derived.flat.oformat[Message]((__ \ "event").format[String])
 
-  // TODO - inherit from message format ?
-//  implicit val assistantRequestFormat: OFormat[AssistantRequest] = derived.flat.oformat[AssistantRequest]((__ \ "event").format[String])
-  // TODO - inherit from message format ?
-//  implicit val userRequestFormat: OFormat[UserRequest] = derived.flat.oformat[UserRequest]((__ \ "event").format[String])
+
+
+
+
+}
+
+object SocksMessagesFormat {
+  import SocksMessages._
+
+  protected val discriminator = (__ \ "event").format[String]
 
   implicit val requestUserDataJsonFormatter = Json.format[RequestUserData]
   implicit val requestConnectionData = Json.format[UserConnectRequest]
+
+
+
+  val assistantRequestReadFormat = derived.flat.reads[AssistantRequest](discriminator)
+  val userRequestReadFormat = derived.flat.reads[UserRequest](discriminator)
+
+  val messageFormat = derived.flat.oformat[Message](discriminator)
+
 
 }
