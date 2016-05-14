@@ -2,7 +2,7 @@ package actors
 
 import java.net.URLDecoder
 import java.util.Date
-import actors.messages.SocksMessagesFormat
+import actors.messages.{SocksMessagesFormats, SocksMessages}
 import models.{UserHelper, UserStatsOSData, UserStatsUserAgent, VisitorStats}
 import play.api.mvc.RequestHeader
 import play.sockjs.api.SockJS.{MessageFlowTransformer, MessageFormatter}
@@ -177,7 +177,7 @@ object UserConnection {
 
   import actors.messages.SocksMessages
 
-  implicit val userRequestMessageFormatter: MessageFlowTransformer[UserRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[UserRequest, Message]( SocksMessagesFormat.userRequestReadFormat, SocksMessagesFormat.messageFormat  )
+  implicit val userRequestMessageFormatter: MessageFlowTransformer[UserRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[UserRequest, Message]( SocksMessagesFormats.userRequestReadFormat, SocksMessagesFormats.messageFormat  )
 
 
   case class InitializationFailed( error : Exception )

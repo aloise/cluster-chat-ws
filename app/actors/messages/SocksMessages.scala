@@ -6,7 +6,7 @@ import java.util.Date
 import actors.ChatRoom.ChatRoomData
 import akka.actor.ActorRef
 import akka.stream.scaladsl.Flow
-import julienrf.json.derived
+import julienrf.variants.Variants
 import models.base.Collection.ObjId
 import models._
 import play.api.libs.json._
@@ -47,11 +47,11 @@ object SocksMessages {
   trait Request
   trait Response
 
-  trait UserRequest extends Request
-  trait UserResponse extends Response
+  sealed trait UserRequest extends Request
+  sealed trait UserResponse extends Response
 
-  trait AssistantRequest extends Request
-  trait AssistantResponse extends Response
+  sealed trait AssistantRequest extends Request
+  sealed trait AssistantResponse extends Response
 
 
 
@@ -165,13 +165,10 @@ object SocksMessages {
   case class Pong( created:Date = new Date() ) extends Message with Response
 
 
-
-
-
-
 }
 
-object SocksMessagesFormat {
+
+object SocksMessagesFormats {
   import SocksMessages._
 
   protected val discriminator = (__ \ "event").format[String]
@@ -181,10 +178,12 @@ object SocksMessagesFormat {
 
 
 
-  val assistantRequestReadFormat = derived.flat.reads[AssistantRequest](discriminator)
-  val userRequestReadFormat = derived.flat.reads[UserRequest](discriminator)
+  val assistantRequestReadFormat = Variants.reads[AssistantRequest](discriminator)
+  val userRequestReadFormat = Variants.reads[UserRequest](discriminator)
 
-  val messageFormat = derived.flat.oformat[Message](discriminator)
+  val messageFormat = Variants.format[Message](discriminator)
 
 
 }
+
+

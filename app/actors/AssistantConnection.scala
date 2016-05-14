@@ -15,7 +15,7 @@ import akka.pattern._
 import play.api.libs.concurrent.Execution.Implicits._
 import reactivemongo.api.QueryOpts
 import reactivemongo.play.json.BSONFormats._
-import actors.messages.{SocksMessagesFormat, SocksMessages}
+import actors.messages.{SocksMessagesFormats, SocksMessages}
 import play.api.Logger
 import reactivemongo.play.json._
 import reactivemongo.play.json._
@@ -163,7 +163,7 @@ object AssistantConnection {
 
   class AssistantLoginException( str:String ) extends Exception(str)
 
-  implicit val assistantRequestMessageFormatter: MessageFlowTransformer[AssistantRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[AssistantRequest, Message]( SocksMessagesFormat.assistantRequestReadFormat, SocksMessagesFormat.messageFormat )
+  implicit val assistantRequestMessageFormatter: MessageFlowTransformer[AssistantRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[AssistantRequest, Message]( SocksMessagesFormats.assistantRequestReadFormat, SocksMessagesFormats.messageFormat )
 
 
   def getActorProps( request:RequestHeader, companyMaster:ActorRef ):SockJS.HandlerProps = {
