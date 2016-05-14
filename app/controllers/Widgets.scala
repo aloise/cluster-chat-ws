@@ -2,13 +2,14 @@ package controllers
 
 import java.net.URLEncoder
 import javax.inject.Inject
+import com.google.inject.Provider
 import controllers.helpers.ApiResponses._
 import models.{Widget, UserHelper, Assistant}
 import models.permissions._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.{Logger, Play}
-import play.api.cache.Cache
+import play.api.cache.{CacheApi, Cache}
 import play.twirl.api.JavaScript
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.play.json._
@@ -39,11 +40,13 @@ import models.Widgets.{jsonFormat => widgetsJsonFormat, TriggerIds}
  * Created by aloise on 17.10.14.
  */
 
-class Widgets @Inject() ( implicit app:play.api.Application )  extends Controller {
+class Widgets @Inject() ( implicit cache:CacheApi ) extends Controller {
 
   import models.Companies.{ jsonFormat => j0 }
 
   def embed( widgetId:String ) = Action.async { request =>
+
+
 
     // get the referer
     val refererOpt = request.getQueryString("refererURL")
@@ -102,6 +105,7 @@ class Widgets @Inject() ( implicit app:play.api.Application )  extends Controlle
 
 
   def embedIframe( widgetId:String ) = Action.async { request =>
+
     // track the visitor in async manner
     val widgetContent: Future[Option[JavaScript]] = BSONObjectID.parse( widgetId ).map { widgetObjId =>
 
@@ -155,6 +159,7 @@ class Widgets @Inject() ( implicit app:play.api.Application )  extends Controlle
   }
 
   protected def getWidgetJavascriptHtml( widget: models.Widget, refererOpt:Option[String] )( implicit r:RequestHeader ) :play.twirl.api.Html = {
+
     val widgetConfig = Json.obj(
       "socksGateway" -> JsString( "gateway/user" ),
       "widgetHeader" -> widget.widgetHeader,

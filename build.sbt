@@ -17,6 +17,8 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   filters,
+  specs2 % Test,
+  "org.specs2" %% "specs2-core" % "3.8" % "test",
   "commons-io" % "commons-io" % "2.4",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11",
   "com.github.fdimuccio" %% "play2-sockjs" % "0.5.0",
@@ -32,6 +34,8 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-mailer" % "4.0.0",
   "org.cvogt" %% "play-json-extensions" % "0.8.0",
   "org.apache.commons" % "commons-lang3" % "3.4"
+
+
 
 )
 

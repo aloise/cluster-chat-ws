@@ -2,8 +2,9 @@ package models
 
 
 import java.util.Date
+import com.google.inject.Inject
 import models.ChatRooms._
-import play.api.cache.Cache
+import play.api.cache.{CacheApi, Cache}
 import play.twirl.api.JavaScript
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.play.json.BSONFormats._
@@ -15,9 +16,9 @@ import play.api.Application
 import models.ChatRooms._
 import reactivemongo.core.commands.Count
 
+import scala.concurrent.duration.Duration
 import scala.reflect.ClassTag
 
-//TODO - check imports - copied from assistants
 import models.base.Collection
 import models.base.Collection._
 import play.api.libs.Crypto
@@ -92,20 +93,23 @@ object Widgets extends Collection("widgets", Json.format[Widget]) {
 
 }
 
-abstract class CachedEntity[T:ClassTag] {
-    protected val widgetCacheExpiration = 60*60*24
+abstract class CachedEntity[T:ClassTag]  {
+
+    import scala.concurrent.duration._
+
+    protected val widgetCacheExpiration = 1.day
     protected def cacheName(s:String):String
 
-    def read(widgetId:String)(implicit app:Application ):Option[T] = {
-        Cache.getAs[T](cacheName(widgetId))
+    def read(widgetId:String)( implicit cache:CacheApi ):Option[T] = {
+        cache.get(cacheName(widgetId)).map( _.asInstanceOf[T] )
     }
 
-    def write( widgetId:String, script:T )(implicit app:Application ) = {
-        Cache.set( cacheName(widgetId), script, widgetCacheExpiration )
+    def write( widgetId:String, script:T )( implicit cache:CacheApi ) = {
+        cache.set( cacheName(widgetId), script, widgetCacheExpiration )
     }
 
-    def clear( widgetId:String )(implicit app:Application ) = {
-        Cache.remove( cacheName(widgetId) )
+    def clear( widgetId:String )( implicit cache:CacheApi ) = {
+        cache.remove( cacheName(widgetId) )
     }
 
 }

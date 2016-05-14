@@ -11,6 +11,7 @@ import models.base.Collection.ObjId
 import models.permissions._
 import models.permissions.CompanyPermission._
 import models.permissions.CompanyPermission.CompanyPermissionItem
+import play.api.cache.CacheApi
 import play.api.libs.json.{JsNull, JsUndefined, JsValue, Json}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
@@ -140,7 +141,7 @@ object Companies extends Collection("companies", Json.format[Company]) {
     )
   )
 
-  def delete(companyId:ObjId)(implicit app:play.api.Application) = {
+  def delete(companyId:ObjId)(implicit cache:CacheApi) = {
 
     val widgets = models.Widgets.collection.find(Json.obj("companyId" -> companyId))
     val widgetCacheCleanFuture =

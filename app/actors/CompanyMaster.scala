@@ -1,11 +1,12 @@
 package actors
 
+import actors.Company.BusinessCatalystTokenRefreshTick
 import akka.actor.Actor.Receive
 import akka.actor._
 import models.base.Collection.ObjId
 import play.api.libs.json._
 import reactivemongo.play.json.BSONFormats._
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import play.api.libs.concurrent.Execution.Implicits._
 import reactivemongo.play.json._
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
@@ -82,6 +83,29 @@ class CompanyMaster extends Actor {
   protected def companyActorProps( company:models.Company, companyMaster:ActorRef ) = {
     context.actorOf( Props( classOf[actors.Company], company, companyMaster ) )
   }
+
+  override def preStart = {
+
+    models.ChatRooms.closeOutdatedChatRooms()
+
+    refreshOAuthTokens( self )
+
+  }
+
+  protected def refreshOAuthTokens( companyMaster:ActorRef ) = {
+
+    val q = Json.obj( "businessCatalystOAuthResponse.refresh_token" -> Json.obj( "$ne" -> JsNull ) )
+
+    models.Companies.collection.find(q).cursor[models.Company]().collect[Seq]().foreach { companies =>
+
+      companies.foreach { company =>
+        companyMaster ! CompanyMessage( company._id, BusinessCatalystTokenRefreshTick )
+      }
+
+    }
+
+  }
+
 }
 
 object CompanyMaster {
