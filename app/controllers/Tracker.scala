@@ -38,7 +38,7 @@ import controllers.helpers.JsonResponses._
 /**
  * Created by pc3 on 02.12.14.
  */
-object Tracker extends Controller {
+class Tracker extends Controller {
 
   case class TrackerData(
     trackingCookie:Option[String] = None

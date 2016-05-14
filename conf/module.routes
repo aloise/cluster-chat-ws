@@ -19,19 +19,18 @@ OPTIONS        /tracker/widget/*path                                       contr
 
 # map all user connections
 
-->             /gateway/user                                               controllers.UserGateway.sockjs
+->             /gateway/user                                               controllers.UserGateway
 OPTIONS        /user/chat/*path                                            controllers.Application.crossOriginOptions( path:String )
 POST           /user/chat/feedback/:chatRoomId                             controllers.UserGateway.saveChatFeedback( chatRoomId:String )
 POST           /user/chat/email/:chatRoomId/:userToken                     controllers.UserGateway.userEmailChat( chatRoomId:String, userToken:String )
 
 
-OPTIONS    /          controllers.Application.crossOriginOptions(path: String ?= "")
-OPTIONS    /*path     controllers.Application.crossOriginOptions(path)
+OPTIONS    /                                                                controllers.Application.crossOriginOptions(path: String ?= "")
+OPTIONS    /*path                                                           controllers.Application.crossOriginOptions(path)
 
 # assistant gateway
 
-#GET            /gateway/assistant/iframe.html                             controllers.AssistantGateway.iframeGateway()
-->             /gateway/assistant                                          controllers.AssistantGateway.sockjs
+->             /gateway/assistant                                          controllers.AssistantGateway
 
 # Cross- origin assets
 GET            /assets/fonts/*file                                         controllers.Application.crossOriginAssets( path = "/public/fonts", file )

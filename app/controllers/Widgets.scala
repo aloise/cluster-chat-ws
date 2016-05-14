@@ -38,7 +38,7 @@ import models.Widgets.{jsonFormat => widgetsJsonFormat, TriggerIds}
  * Created by aloise on 17.10.14.
  */
 
-object Widgets extends Controller {
+class Widgets extends Controller {
 
   import models.Companies.{ jsonFormat => j0 }
 

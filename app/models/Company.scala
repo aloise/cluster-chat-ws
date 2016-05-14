@@ -98,21 +98,6 @@ object Companies extends Collection("companies", Json.format[Company]) {
     val PaymentProfileNotConfigured = "payment_profile_not_configured"
   }
 
-  def refreshOAuthTokens() = {
-
-    val q = Json.obj( "businessCatalystOAuthResponse.refresh_token" -> Json.obj( "$ne" -> JsNull ) )
-
-    models.Companies.collection.find(q).cursor[models.Company]().collect[Seq]().foreach { companies =>
-
-      companies.foreach { company =>
-        global.Application.companyMaster ! CompanyMessage( company._id, BusinessCatalystTokenRefreshTick )
-      }
-
-    }
-
-  }
-
-
 
   def findByBusinessCatalystSiteId( siteId: String, businessCatalystAppKey:String ):Future[Option[Company]] = {
     collection.find( Json.obj(

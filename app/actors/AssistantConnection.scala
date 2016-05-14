@@ -9,7 +9,7 @@ import controllers.helpers.AssistantAuthAction
 import models.ChatRoomMessage
 import play.api.mvc.RequestHeader
 import play.sockjs.api.SockJS
-import play.sockjs.api.SockJS.MessageFormatter
+import play.sockjs.api.SockJS.{MessageFlowTransformer, MessageFormatter}
 import play.api.libs.json._
 import akka.pattern._
 import play.api.libs.concurrent.Execution.Implicits._
@@ -26,7 +26,7 @@ import play.modules.reactivemongo.json.collection._
  * Date: 02.11.14
  * Time: 10:17
  */
-class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef ) extends Actor {
+class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef, companyMaster:ActorRef ) extends BaseChatActor( companyMaster ) {
 
   import UserConnection._
   import models.Widgets.{ jsonFormat => wigetsJsonFormat }
@@ -44,7 +44,7 @@ class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef )
       // company join
       val joinMsg = CompanyMaster.CompanyMessage( assistant.companyId, AssistantCompanyJoin( self, assistant, company ) )
 
-      global.Application.companyMaster ! joinMsg
+      companyMaster ! joinMsg
 
       context.become( receiveJoinCompany( assistant, company ) )
 
@@ -58,7 +58,7 @@ class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef )
 
     case AssistantCompanyJoinSuccess( companyActor ) =>
 
-      assistantSocksActor ! AssistantGreeting( global.Application.appName , global.Application.appVersion )
+      assistantSocksActor ! AssistantGreeting( appName , appVersion )
 
       context.become( receiveNormal( assistant, company, companyActor ) )
 
@@ -159,12 +159,15 @@ class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef )
 
 object AssistantConnection {
 
+
+
   class AssistantLoginException( str:String ) extends Exception(str)
 
-  implicit val assistantRequestMessageFormatter: MessageFormatter[AssistantRequest] = customMessageFormatter[AssistantRequest]
+  implicit val assistantRequestMessageFormatter: MessageFlowTransformer[AssistantRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[AssistantRequest, Message]
 
-  def getActorProps( request:RequestHeader ):SockJS.HandlerProps = {
-    assistantSocksActor => Props( classOf[AssistantConnection], request, assistantSocksActor )
+
+  def getActorProps( request:RequestHeader, companyMaster:ActorRef ):SockJS.HandlerProps = {
+    assistantSocksActor => Props( classOf[AssistantConnection], request, assistantSocksActor, companyMaster )
   }
 
 }

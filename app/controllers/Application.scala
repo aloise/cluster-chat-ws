@@ -2,7 +2,6 @@ package controllers
 
 import java.util.{GregorianCalendar, Date}
 import javax.xml.datatype.DatatypeFactory
-import controllers.UserGateway._
 import controllers.helpers.AssistantAuthAction
 import controllers.helpers.AuthAction._
 import controllers.helpers.JsonResponses._
@@ -24,7 +23,7 @@ import scala.concurrent.Future
 import scala.util.Try
 
 
-object Application extends BaseController {
+class Application extends BaseController {
 
   import helpers.HeaderHelpers._
 

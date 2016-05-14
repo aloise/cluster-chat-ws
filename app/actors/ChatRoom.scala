@@ -1,6 +1,7 @@
 package actors
 
 import java.util.Date
+import javax.inject.Inject
 
 import akka.util.Timeout
 import models.BusinessCatalystOAuth._
@@ -30,7 +31,7 @@ import scala.util.Try
  * Date: 15.10.14
  * Time: 22:47
  */
-class ChatRoom( var chatRoom: models.ChatRoom, companyActor: ActorRef ) extends Actor {
+class ChatRoom( var chatRoom: models.ChatRoom, companyActor: ActorRef, companyMaster: ActorRef ) extends BaseChatActor( companyMaster ) {
 
   import ChatRoom._
   import models.ChatRoomHelper._
@@ -38,7 +39,10 @@ class ChatRoom( var chatRoom: models.ChatRoom, companyActor: ActorRef ) extends 
   import reactivemongo.play.json.BSONFormats._
   import models.ChatRooms.{ jsonFormat => j6 }
 
-  protected val userReconnectTimeout = Play.configuration.getMilliseconds( "chat_room.user_timeout" ).getOrElse( 60000L ).milliseconds
+  @Inject()
+  protected val conf:play.api.Configuration = null
+
+  protected val userReconnectTimeout = conf.getMilliseconds( "chat_room.user_timeout" ).getOrElse( 60000L ).milliseconds
 
   var chatRoomCreator = chatRoom.user
 

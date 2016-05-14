@@ -33,7 +33,7 @@ import BusinessCatalystOAuth._
  * Date: 18.10.14
  * Time: 23:17
  */
-class Company( company:models.Company ) extends Actor {
+class Company( company:models.Company, companyMaster:ActorRef ) extends BaseChatActor( companyMaster ) {
 
   import Company._
   import models.ChatRooms.{ jsonFormat => chatRoomJsonFormat }
@@ -62,7 +62,7 @@ class Company( company:models.Company ) extends Actor {
       chatRoomId.fold[Future[Any]] {
         // chat room id is empty
         Company.createNewChatRoom( widget, userRequestData, visitorStats ) flatMap { chatRoomData =>
-            val chatRoomActor = context.actorOf( chatRoomActorProps( chatRoomData ) )
+            val chatRoomActor = context.actorOf( chatRoomActorProps( chatRoomData, companyMaster ) )
 
             chatRoomJoinUser( me, n, chatRoomActor, chatRoomData, userActor)
 
@@ -79,7 +79,7 @@ class Company( company:models.Company ) extends Actor {
           // try to resurrect the chat room
           reloadChatRoom( chatRoomObjId ) flatMap { chatRoomData =>
 
-            val chatRoomActor = context.actorOf(chatRoomActorProps(chatRoomData))
+            val chatRoomActor = context.actorOf(chatRoomActorProps(chatRoomData, companyMaster))
 
             chatRoomJoinUser(me, n, chatRoomActor, chatRoomData, userActor)
 
@@ -342,7 +342,7 @@ class Company( company:models.Company ) extends Actor {
 
       reloadChatRoom( chatRoomId ) map { chatRoomData =>
 
-        val chatRoomActor = context.actorOf(chatRoomActorProps(chatRoomData))
+        val chatRoomActor = context.actorOf(chatRoomActorProps(chatRoomData, companyMaster))
 
         addChatRoom( chatRoomActor, chatRoomData )
 
@@ -465,8 +465,8 @@ class Company( company:models.Company ) extends Actor {
     }
   }
 
-  protected def chatRoomActorProps( c: models.ChatRoom ) =
-    Props( classOf[actors.ChatRoom], c, self )
+  protected def chatRoomActorProps( c: models.ChatRoom, companyMaster:ActorRef ) =
+    Props( classOf[actors.ChatRoom], c, self, companyMaster )
 
   override def postStop(): Unit = {
 
@@ -522,21 +522,6 @@ object Company {
   case class BusinessCatalystTokenRefreshResult( result:Try[ExchangeTokenResponse])
 
   case object BusinessCatalystStopTokenRefresh
-
-
-  def refreshOAuthTokens() = {
-
-    val q = Json.obj( "businessCatalystOAuthResponse.refresh_token" -> Json.obj( "$ne" -> JsNull ) )
-
-    models.Companies.collection.find(q).cursor[models.Company]().collect[Seq]().foreach { companies =>
-
-      companies.foreach { company =>
-        global.Application.companyMaster ! CompanyMessage( company._id, BusinessCatalystTokenRefreshTick )
-      }
-
-    }
-
-  }
 
 
 

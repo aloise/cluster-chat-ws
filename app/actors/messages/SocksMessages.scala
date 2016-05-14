@@ -5,10 +5,12 @@ import java.util.Date
 
 import actors.ChatRoom.ChatRoomData
 import akka.actor.ActorRef
-import julienrf.variants.Variants
+import akka.stream.scaladsl.Flow
+import julienrf.json.derived
 import models.base.Collection.ObjId
 import models._
 import play.api.libs.json._
+import play.sockjs.api.Frame
 
 import scala.util.Try
 
@@ -162,10 +164,17 @@ object SocksMessages {
   case class AssistantPing( created:Date = new Date() ) extends Message with AssistantRequest
   case class Pong( created:Date = new Date() ) extends Message with Response
 
-  implicit val messageFormat: Format[Message] = Variants.format[Message]((__ \ "event").format[String])
+  implicit val messageFormat: OFormat[Message] = derived.flat.oformat[Message]((__ \ "event").format[String])
+
+  // TODO - inherit from message format ?
+  implicit val assistantRequestFormat: OFormat[AssistantRequest] = derived.flat.oformat[AssistantRequest]((__ \ "event").format[String])
+  // TODO - inherit from message format ?
+  implicit val userRequestFormat: OFormat[UserRequest] = derived.flat.oformat[UserRequest]((__ \ "event").format[String])
+
   implicit val requestUserDataJsonFormatter = Json.format[RequestUserData]
   implicit val requestConnectionData = Json.format[UserConnectRequest]
 
+  /*
   implicit val messageFormatter: MessageFormatter[Message] =
     MessageFormatter(
       data => {
@@ -227,5 +236,12 @@ object SocksMessages {
 
 
 
+  def customMessageFormatter[T : ClassTag ]:MessageFlowTransformer[String,Message] =
+    new MessageFlowTransformer[String,Message] {
+      override def transform(flow: Flow[String, Message, _]): Flow[String, Message, _] = {
 
+      }
+    }
+
+  */
 }

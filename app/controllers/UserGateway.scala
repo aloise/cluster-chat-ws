@@ -1,17 +1,21 @@
 package controllers
 
 import java.net.URLDecoder
+import javax.inject.Inject
 
 import actors.Company.{GetActiveAssistants, NewUserJoin}
-import actors.{CompanyMaster, UserConnection, ChatRoom}
+import actors.{AssistantConnection, CompanyMaster, UserConnection, ChatRoom}
 import akka.actor.ActorSystem
+import akka.stream.Materializer
 import controllers.helpers.HeaderHelpers
 import controllers.helpers.JsonResponses._
+import global.ApplicationLifecycleMonitor
 import models.MessageFromTypes._
 import models.{ MessageFromTypes, ChatRoomHelper, ChatRoomUserFeedback}
 import models.BusinessCatalystOAuth._
 import models.base.Collection.ObjId
 import play.api.libs.concurrent.Akka
+import play.api.libs.streams.ActorFlow
 import play.sockjs.api.SockJS.MessageFormatter
 import reactivemongo.play.json._
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
@@ -40,7 +44,7 @@ import scala.util._
  * Date: 15.10.14
  * Time: 22:22
  */
-object UserGateway extends Controller {
+class UserGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materializer ) extends SockJSRouter with BaseController {
 
   import actors.messages.SocksMessages._
   import UserConnection.userRequestMessageFormatter
@@ -60,12 +64,13 @@ object UserGateway extends Controller {
       ( __ \ "widgetId" ).read[BSONObjectID]
   ).tupled
 
-  val sockJSSettings = SockJSSettings.default
+  override protected def settings = SockJSSettings()
 
   // a default socksjs connector
-  lazy val sockjs = SockJSRouter(sockJSSettings).tryAcceptWithActor[UserRequest, Message] { request =>
+  def sockjs = SockJS.accept[UserRequest, Message] { request =>
     // connect the websocket. All processing and error reporting is done inside the UserConnection actor
-    Future.successful( Right( UserConnection.getActorProps(request) ) )
+    // UserConnection.getActorProps(request)
+    ActorFlow.actorRef[UserRequest, Message]( UserConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
 
   }
 

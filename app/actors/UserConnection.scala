@@ -4,7 +4,7 @@ import java.net.URLDecoder
 import java.util.Date
 import models.{UserHelper, UserStatsOSData, UserStatsUserAgent, VisitorStats}
 import play.api.mvc.RequestHeader
-import play.sockjs.api.SockJS.MessageFormatter
+import play.sockjs.api.SockJS.{MessageFlowTransformer, MessageFormatter}
 
 import scala.concurrent.Future
 import reactivemongo.play.json.BSONFormats._
@@ -42,7 +42,7 @@ import play.modules.reactivemongo.json.collection._
  * Time: 22:26
  */
 
-class UserConnection( userSocksActor:ActorRef, request:RequestHeader ) extends Actor {
+class UserConnection( userSocksActor:ActorRef, request:RequestHeader, companyMaster:ActorRef ) extends BaseChatActor( companyMaster ) {
 
   // wait for an disconnect
   context.watch( userSocksActor )
@@ -58,7 +58,7 @@ class UserConnection( userSocksActor:ActorRef, request:RequestHeader ) extends A
       errorAndStop(ex)
 
     case UserConnection.InitializedSuccessfully( widget, initialChatIdOpt, requestUserData, visitorData, assistants ) =>
-        userSocksActor ! UserGreeting( global.Application.appName, global.Application.appVersion, widget.userGreetingMessage, assistants )
+        userSocksActor ! UserGreeting( appName, appVersion, widget.userGreetingMessage, assistants )
 
         joinChatRoom( widget, initialChatIdOpt, requestUserData, visitorData )
         context.become( receiveOnChatRoomJoin( widget, initialChatIdOpt ) )
@@ -118,7 +118,7 @@ class UserConnection( userSocksActor:ActorRef, request:RequestHeader ) extends A
 
     val joinMsg = CompanyMaster.CompanyMessage( widget.companyId, NewUserJoin( widget, initialChatIdOpt, userRequestData , self, visitorStats ) )
 
-    global.Application.companyMaster ! joinMsg
+    companyMaster ! joinMsg
   }
 
 
@@ -176,14 +176,14 @@ object UserConnection {
 
   import actors.messages.SocksMessages
 
-  implicit val userRequestMessageFormatter: MessageFormatter[UserRequest] = customMessageFormatter[UserRequest]
+  implicit val userRequestMessageFormatter: MessageFlowTransformer[UserRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[UserRequest, Message]
 
 
   case class InitializationFailed( error : Exception )
   case class InitializedSuccessfully( widget:models.Widget, initialChatRoomIdOpt:Option[ObjId], userRequestData: RequestUserData, visitorStats:VisitorStats, assistants:Seq[models.AssistantInfo] )
 
-  def getActorProps( request:RequestHeader ):SockJS.HandlerProps = {
-    userSocksActor => Props( classOf[UserConnection], userSocksActor, request )
+  def getActorProps( request:RequestHeader, companyMaster:ActorRef ):SockJS.HandlerProps = {
+    userSocksActor => Props( classOf[UserConnection], userSocksActor, request, companyMaster )
   }
 
 

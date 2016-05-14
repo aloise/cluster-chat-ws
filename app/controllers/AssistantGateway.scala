@@ -1,12 +1,16 @@
 package controllers
 
 import java.net.URLDecoder
+import javax.inject.Inject
 
 import actors.{UserConnection, AssistantConnection}
 import actors.messages.SocksMessages.{AssistantRequest, Message}
+import akka.stream.Materializer
+import global.ApplicationLifecycleMonitor
 import play.api.libs.json.{JsString, Json}
+import play.api.libs.streams.ActorFlow
 import play.api.mvc.{RequestHeader, Controller}
-import play.sockjs.api.{SockJSRouter, SockJSSettings}
+import play.sockjs.api._
 import reactivemongo.play.json._
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
 import play.modules.reactivemongo.json.collection._
@@ -17,21 +21,19 @@ import actors.messages.SocksMessages._
 import AssistantConnection.assistantRequestMessageFormatter
 import models.Widgets.{ jsonFormat => widgetJsonFormat }
 
-import play.api.Play.current
-
 /**
  * User: aloise
  * Date: 02.11.14
  * Time: 9:42
  */
-object AssistantGateway  extends Controller  {
+class AssistantGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materializer ) extends SockJSRouter with BaseController  {
 
-  val sockJSSettings = SockJSSettings.default
+  override protected def settings = SockJSSettings()
 
-  lazy val sockjs = SockJSRouter(sockJSSettings).tryAcceptWithActor[AssistantRequest, Message] { request =>
+  def sockjs = SockJS.accept [AssistantRequest, Message] { request =>
 
     // connect the websocket. All processing and error reporting is done inside the UserConnection actor
-    Future.successful( Right( AssistantConnection.getActorProps( request ) ) )
+    ActorFlow.actorRef[AssistantRequest, Message]( AssistantConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
 
   }
 

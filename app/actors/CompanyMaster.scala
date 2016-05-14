@@ -62,7 +62,7 @@ class CompanyMaster extends Actor {
 
     models.Companies.collection.find( Json.obj( "_id" -> companyId ) ).one[models.Company].map {
       case Some( company ) =>
-        val actor = companyActorProps( company )
+        val actor = companyActorProps( company, self )
 
         // forward messages
         sendMessage.foreach{ msg =>
@@ -79,8 +79,8 @@ class CompanyMaster extends Actor {
 
   }
 
-  protected def companyActorProps( company:models.Company ) = {
-    context.actorOf( Props( classOf[actors.Company], company ) )
+  protected def companyActorProps( company:models.Company, companyMaster:ActorRef ) = {
+    context.actorOf( Props( classOf[actors.Company], company, companyMaster ) )
   }
 }
 
