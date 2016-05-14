@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   "org.julienrf" % "play-json-derived-codecs_2.11" % "3.3",
   "net.sf.uadetector" % "uadetector-resources" % "2014.10",
   "com.netaporter" %% "scala-uri" % "0.4.14",
-  "joda-time" % "joda-time" % "2.5",
+  "joda-time" % "joda-time" % "2.9.2",
   "commons-io" % "commons-io" % "2.4",
   "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.5",
   "com.github.tototoshi" %% "scala-csv" % "1.2.2",
