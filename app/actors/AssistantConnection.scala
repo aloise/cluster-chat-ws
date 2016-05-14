@@ -163,7 +163,7 @@ object AssistantConnection {
 
   class AssistantLoginException( str:String ) extends Exception(str)
 
-  implicit val assistantRequestMessageFormatter: MessageFlowTransformer[AssistantRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[AssistantRequest, Message]
+  implicit val assistantRequestMessageFormatter: MessageFlowTransformer[Message, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[Message, Message]
 
 
   def getActorProps( request:RequestHeader, companyMaster:ActorRef ):SockJS.HandlerProps = {

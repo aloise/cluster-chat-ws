@@ -1,6 +1,7 @@
 package controllers
 
 import java.net.URLEncoder
+import javax.inject.Inject
 import controllers.helpers.ApiResponses._
 import models.{Widget, UserHelper, Assistant}
 import models.permissions._
@@ -17,7 +18,7 @@ import reactivemongo.core.commands.Count
 import models.base.Collection
 import play.api.libs.concurrent.Execution.Implicits._
 import models.base.Collection.ObjId
-import play.api.Play.current
+
 
 import scala.concurrent.Future
 import scala.util._
@@ -38,7 +39,7 @@ import models.Widgets.{jsonFormat => widgetsJsonFormat, TriggerIds}
  * Created by aloise on 17.10.14.
  */
 
-class Widgets extends Controller {
+class Widgets @Inject() ( implicit app:play.api.Application )  extends Controller {
 
   import models.Companies.{ jsonFormat => j0 }
 

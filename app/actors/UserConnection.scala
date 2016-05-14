@@ -176,7 +176,7 @@ object UserConnection {
 
   import actors.messages.SocksMessages
 
-  implicit val userRequestMessageFormatter: MessageFlowTransformer[UserRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[UserRequest, Message]
+  implicit val userRequestMessageFormatter: MessageFlowTransformer[Message, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[Message, Message]
 
 
   case class InitializationFailed( error : Exception )

@@ -67,10 +67,10 @@ class UserGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materializer
   override protected def settings = SockJSSettings()
 
   // a default socksjs connector
-  def sockjs = SockJS.accept[UserRequest, Message] { request =>
+  def sockjs = SockJS.accept[Message, Message] { request =>
     // connect the websocket. All processing and error reporting is done inside the UserConnection actor
     // UserConnection.getActorProps(request)
-    ActorFlow.actorRef[UserRequest, Message]( UserConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
+    ActorFlow.actorRef[Message, Message]( UserConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
 
   }
 

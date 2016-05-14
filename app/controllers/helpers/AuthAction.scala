@@ -4,7 +4,6 @@ package controllers.helpers
  * Created by Igor Mordashev <aloise@aloise.name> on 24.10.14.
  */
 
-import controllers.routes
 import models.base.Collection.ObjId
 import play.api.libs.Crypto
 import play.api.libs.json.JsValue

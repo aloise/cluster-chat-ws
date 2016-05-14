@@ -164,84 +164,14 @@ object SocksMessages {
   case class AssistantPing( created:Date = new Date() ) extends Message with AssistantRequest
   case class Pong( created:Date = new Date() ) extends Message with Response
 
-  implicit val messageFormat: OFormat[Message] = derived.flat.oformat[Message]((__ \ "event").format[String])
+  implicit val messageFormat = derived.flat.oformat[Message]((__ \ "event").format[String])
 
   // TODO - inherit from message format ?
-  implicit val assistantRequestFormat: OFormat[AssistantRequest] = derived.flat.oformat[AssistantRequest]((__ \ "event").format[String])
+//  implicit val assistantRequestFormat: OFormat[AssistantRequest] = derived.flat.oformat[AssistantRequest]((__ \ "event").format[String])
   // TODO - inherit from message format ?
-  implicit val userRequestFormat: OFormat[UserRequest] = derived.flat.oformat[UserRequest]((__ \ "event").format[String])
+//  implicit val userRequestFormat: OFormat[UserRequest] = derived.flat.oformat[UserRequest]((__ \ "event").format[String])
 
   implicit val requestUserDataJsonFormatter = Json.format[RequestUserData]
   implicit val requestConnectionData = Json.format[UserConnectRequest]
 
-  /*
-  implicit val messageFormatter: MessageFormatter[Message] =
-    MessageFormatter(
-      data => {
-        val js = try {
-          Json.parse( data )
-        } catch {
-          case e:Throwable =>
-            throw new MessageParseException( e.getMessage )
-        }
-
-        messageFormat.reads( js ) match {
-          case JsSuccess(obj, _) =>
-            obj
-          case JsError(_) =>
-            throw new MessageParseException("Message Parse Error")
-        }
-
-      } , {
-        case m:Message =>
-          Json.stringify( messageFormat.writes(m) )
-        case _ =>
-          throw new MessageParseException( "Invalid Message Class" )
-      }
-    )
-
-  def customMessageFormatter[T : ClassTag ]:MessageFormatter[T] =
-    MessageFormatter(
-        data => {
-
-          val js = try {
-            Json.parse( data )
-          } catch {
-            case e:Throwable =>
-              throw new MessageParseException( e.getMessage )
-          }
-
-          val clazz = implicitly[ClassTag[T]].runtimeClass
-
-          messageFormat.reads( js ) match {
-            case JsSuccess(obj, _) =>
-              obj match {
-                case req:T if clazz.isInstance(req) =>
-                  req
-                case _ =>
-                  throw new MessageParseException( "Invalid Message Class" )
-              }
-            case JsError(_) =>
-              throw new MessageParseException( "Message Parse Error" )
-          }
-
-        },
-        {
-          case r:Message =>
-            Json.stringify(messageFormat.writes(r))
-          case _ =>
-            throw new MessageParseException( "Invalid Message Class" )
-        }
-    )
-
-
-
-  def customMessageFormatter[T : ClassTag ]:MessageFlowTransformer[String,Message] =
-    new MessageFlowTransformer[String,Message] {
-      override def transform(flow: Flow[String, Message, _]): Flow[String, Message, _] = {
-
-      }
-    }
-
-  */
 }
