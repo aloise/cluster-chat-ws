@@ -6,6 +6,7 @@ import actors.Company.NewUserJoin
 import actors.messages.SocksMessages._
 import akka.actor.{PoisonPill, Actor, ActorRef, Props}
 import controllers.helpers.AssistantAuthAction
+import global.crypto.CryptoProvider
 import models.ChatRoomMessage
 import play.api.mvc.RequestHeader
 import play.sockjs.api.SockJS
@@ -26,7 +27,7 @@ import play.modules.reactivemongo.json.collection._
  * Date: 02.11.14
  * Time: 10:17
  */
-class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef, companyMaster:ActorRef ) extends BaseChatActor( companyMaster ) {
+class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef, companyMaster:ActorRef, cryptoProvider:CryptoProvider ) extends BaseChatActor( companyMaster ) {
 
   import UserConnection._
   import models.Widgets.{ jsonFormat => wigetsJsonFormat }
@@ -136,7 +137,7 @@ class AssistantConnection( request:RequestHeader, assistantSocksActor:ActorRef, 
 
   override def preStart( ) = {
     // try to login with the session
-    AssistantAuthAction.Implicits.getObject( request ) flatMap { assistant =>
+    AssistantAuthAction.Implicits.getObject( request )(cryptoProvider) flatMap { assistant =>
         val companyF = models.Companies.collection.find( Json.obj( "_id" -> assistant.companyId ) ).one[models.Company]
 
         companyF.map {
@@ -166,8 +167,8 @@ object AssistantConnection {
   implicit val assistantRequestMessageFormatter: MessageFlowTransformer[AssistantRequest, Message] = MessageFlowTransformer.jsonMessageFlowTransformer[AssistantRequest, Message]( SocksMessagesFormats.assistantRequestReadFormat, SocksMessagesFormats.messageFormat )
 
 
-  def getActorProps( request:RequestHeader, companyMaster:ActorRef ):SockJS.HandlerProps = {
-    assistantSocksActor => Props( classOf[AssistantConnection], request, assistantSocksActor, companyMaster )
+  def getActorProps( request:RequestHeader, companyMaster:ActorRef, cryptoProvider:CryptoProvider ):SockJS.HandlerProps = {
+    assistantSocksActor => Props( classOf[AssistantConnection], request, assistantSocksActor, companyMaster, cryptoProvider )
   }
 
 }

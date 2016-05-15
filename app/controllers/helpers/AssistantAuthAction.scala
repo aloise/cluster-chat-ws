@@ -1,5 +1,6 @@
 package controllers.helpers
 
+import global.crypto.CryptoProvider
 import models.Assistant
 import models.base.Collection.ObjId
 import play.api.mvc._
@@ -36,12 +37,18 @@ object AssistantAuthAction {
 
   implicit val companyPermissionJsonFormat = Json.format[CompanyPermissions]
 
-  def getAuthCookie( assistant:models.Assistant, rememberMe:Boolean = false ):Cookie = {
-    Cookie( assistantAuthCookieName, AuthAction.encryptObjId( assistant._id ), if( rememberMe ) Some(cookieMaxAge) else None, assistantAuthCookiePath, httpOnly = false )
+  def getAuthCookie( assistant:models.Assistant, rememberMe:Boolean = false )(implicit cryptoProvider: CryptoProvider):Cookie = {
+    Cookie(
+      assistantAuthCookieName,
+      AuthAction.encryptObjId( assistant._id ),
+      if( rememberMe ) Some(cookieMaxAge) else None,
+      assistantAuthCookiePath,
+      httpOnly = false
+    )
   }
 
   object Implicits {
-    implicit def getObject( request:RequestHeader ): Future[models.Assistant] = {
+    implicit def getObject( request:RequestHeader )( implicit cryptoProvider:CryptoProvider ): Future[models.Assistant] = {
 
       val bsonAssistantIdOpt = request.cookies.get( assistantAuthCookieName ).flatMap { cookie =>
         AuthAction.decryptObjId( cookie.value ).toOption

@@ -7,7 +7,6 @@ import controllers.helpers.AuthAction._
 import controllers.helpers.JsonResponses._
 import models.{Assistant, AssistantRoles}
 import play.api._
-import play.api.libs.Crypto
 import play.api.mvc._
 import play.modules.reactivemongo.{ReactiveMongoPlugin, MongoController}
 import play.twirl.api.JavaScript

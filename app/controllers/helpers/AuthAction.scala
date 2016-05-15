@@ -4,8 +4,8 @@ package controllers.helpers
  * Created by Igor Mordashev <aloise@aloise.name> on 24.10.14.
  */
 
+import global.crypto.CryptoProvider
 import models.base.Collection.ObjId
-import play.api.libs.Crypto
 import play.api.libs.json.JsValue
 import play.api.mvc._
 import play.api.mvc.BodyParsers.parse
@@ -52,13 +52,13 @@ class AuthActionClass {
 
 
 
-  def encryptObjId( id:ObjId ):String = {
-    Crypto.encryptAES( id.stringify )
+  def encryptObjId( id:ObjId )( implicit crypto:CryptoProvider ) :String = {
+    crypto.encryptAES( id.stringify )
   }
 
-  def decryptObjId( str:String ):Try[ObjId] = {
+  def decryptObjId( str:String )( implicit crypto:CryptoProvider ):Try[ObjId] = {
     Try {
-      BSONObjectID( Crypto.decryptAES( str ) )
+      BSONObjectID( crypto.decryptAES( str ) )
     }
   }
 

@@ -21,7 +21,6 @@ import scala.reflect.ClassTag
 
 import models.base.Collection
 import models.base.Collection._
-import play.api.libs.Crypto
 import play.api.mvc.{Result, RequestHeader}
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
@@ -65,7 +64,7 @@ import play.api.libs.json.util._
 object Widgets extends Collection("widgets", Json.format[Widget]) {
 
     import play.api.libs.concurrent.Execution.Implicits._
-    import play.api.Play.current
+
 
     collection.indexesManager.ensure( Index( Seq( "isDeleted" -> IndexType.Hashed ) ) )
     collection.indexesManager.ensure( Index( Seq( "companyId" -> IndexType.Hashed ) ) )

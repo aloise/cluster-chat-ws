@@ -7,6 +7,7 @@ import actors.{UserConnection, AssistantConnection}
 import actors.messages.SocksMessages.{AssistantRequest, Message}
 import akka.stream.Materializer
 import global.ApplicationLifecycleMonitor
+import global.crypto.{CryptoConfigParser, Crypto}
 import play.api.libs.json.{JsString, Json}
 import play.api.libs.streams.ActorFlow
 import play.api.mvc.{RequestHeader, Controller}
@@ -30,10 +31,12 @@ class AssistantGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materia
 
   override protected def settings = SockJSSettings()
 
+
+
   def sockjs = SockJS.accept [AssistantRequest, Message] { request =>
 
     // connect the websocket. All processing and error reporting is done inside the UserConnection actor
-    ActorFlow.actorRef[AssistantRequest, Message]( AssistantConnection.getActorProps( request, app.companyMasterActor ) )( app.companyMasterActorSystem, mat )
+    ActorFlow.actorRef[AssistantRequest, Message]( AssistantConnection.getActorProps( request, app.companyMasterActor, app.getCryptoProvider ) )( app.companyMasterActorSystem, mat )
 
   }
 

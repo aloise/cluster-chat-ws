@@ -6,6 +6,7 @@ import actors.CompanyMaster.CompanyMessage
 import akka.actor.{ActorRef, Props, ActorSystem}
 import com.google.inject.{ImplementedBy, AbstractModule}
 import javax.inject._
+import global.crypto.{Crypto, CryptoConfigParser, CryptoProvider}
 import play.api.inject.{Binding, Module, ApplicationLifecycle}
 import play.api.libs.json.{JsNull, Json}
 import play.modules.reactivemongo.{DefaultReactiveMongoApi, ReactiveMongoApi}
@@ -31,6 +32,10 @@ trait ApplicationLifecycleMonitor {
 
   def onStartup(): Unit
 
+  def getConfig:Configuration
+
+  def getCryptoProvider:CryptoProvider
+
 }
 
 @Singleton
@@ -42,6 +47,9 @@ class ApplicationLifecycleMonitorImpl @Inject() ( implicit ec:ExecutionContext, 
   lazy val companyMasterActorSystem =  ActorSystem( configuration.getString("chat.actorSystemName").getOrElse("default") )
 
   lazy val companyMasterActor = companyMasterActorSystem.actorOf( Props( classOf[CompanyMaster] ) )
+
+  lazy val cryptoProvider:CryptoProvider = new Crypto( CryptoConfigParser.get( configuration ) )
+
 
 
   override def onStartup(): Unit = {
@@ -63,4 +71,8 @@ class ApplicationLifecycleMonitorImpl @Inject() ( implicit ec:ExecutionContext, 
 
   // Called when this singleton is constructed (could be replaced by `hello()`)
   onStartup()
+
+  override def getConfig(): Configuration = configuration
+
+  override def getCryptoProvider: CryptoProvider = cryptoProvider
 }

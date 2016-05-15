@@ -5,11 +5,11 @@ import java.io.{ByteArrayOutputStream, FileInputStream, File}
 
 import com.sksamuel.scrimage.Image
 import com.sksamuel.scrimage.nio.PngWriter
+import global.crypto.CryptoProvider
 import models.ChatRooms._
 import models.base.Collection
 import models.base.Collection._
 import models.permissions.CompanyPermission.CompanyPermissionItem
-import play.api.libs.Crypto
 import play.api.mvc.{Result, RequestHeader}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.indexes.{IndexType, Index}
@@ -85,14 +85,14 @@ object Assistants extends Collection("assistants", Json.format[Assistant]) {
   abstract class AuthorizeException( reason:String ) extends Exception( reason )
   class CompanyAccessBlockedException( reason:String ) extends AuthorizeException( reason )
 
-  def authorize( usernameOrEmail:String, password:String, companyId:Option[BSONObjectID] = None ):Future[Option[models.Assistant]] = {
+  def authorize( usernameOrEmail:String, password:String, companyId:Option[BSONObjectID] = None )( implicit cryptoProvider: CryptoProvider ):Future[Option[models.Assistant]] = {
 
     val opts = Json.obj(
       "$or" -> Json.arr(
         Json.obj( "email" -> usernameOrEmail ),
         Json.obj( "username" -> usernameOrEmail )
       ),
-      "password" -> Crypto.sign( password ),
+      "password" -> cryptoProvider.sign( password ),
       "isDeleted" -> false
     ) ++ companyId.fold( Json.obj() )( cid => Json.obj( "companyId" -> companyId ) )
 
@@ -243,8 +243,8 @@ object Assistants extends Collection("assistants", Json.format[Assistant]) {
     ) flatMap { error =>
       if( error.ok ){
         models.Assistants.collection.find(Json.obj("_id" -> assistant._id )).one[models.Assistant] map {
-          case Some( assistant ) =>
-            assistant
+          case Some( assistantObj ) =>
+            assistantObj
           case _ =>
             throw new Exception("assistant_not_found")
         }

@@ -28,7 +28,6 @@ import controllers.helpers.{AuthAction, AssistantAuthAction}
 import controllers.helpers.AssistantAuthAction.Implicits._
 import controllers.helpers.AuthAction._
 import controllers.helpers.JsonResponses._
-import play.api.libs.Crypto
 import play.api.mvc.{ Action, Controller, Cookie, RequestHeader }
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
