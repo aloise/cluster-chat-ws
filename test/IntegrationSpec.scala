@@ -1,4 +1,7 @@
 import org.junit.runner._
+import org.specs2._
+import org.specs2.runner.JUnitRunner
+import play.api.test._
 
 /**
  * add your integration spec here.
