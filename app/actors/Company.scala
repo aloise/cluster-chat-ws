@@ -498,7 +498,6 @@ object Company {
 
   case class NewUserJoin( widget: models.Widget, chatRoomId:Option[ObjId], userRequestData: RequestUserData, userActor:ActorRef, visitorStats:VisitorStats )
 
-
   case class ChatRoomExtendedInfo( chatRoomId:ObjId , chatRoomData:models.ChatRoom)
 
   case class NewUserJoinedSuccessfully( joinRequest:NewUserJoin, chatRoomActor:ActorRef, chatRoomData:ChatRoomData )
@@ -507,13 +506,13 @@ object Company {
   case class NewUserJoinFailed(  joinRequest:NewUserJoin, ex:Throwable )
 
   object GetActiveAssistants
+
   case class GetActiveAssistantsResult( assistants:Seq[models.Assistant])
   case class DeleteAssistant( assistantId:ObjId )
 
   case class WidgetDeleted( widgetId: ObjId )
 
   case class CompanyDeleted( message:String = "" )
-
 
   case class BusinessCatalystStartTokenRefresh( data:ExchangeTokenResponse )
   case object BusinessCatalystTokenRefreshTick

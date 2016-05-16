@@ -77,18 +77,3 @@ object UserHelper {
 
   def getRandomColor = randomColor.nextInt(20)
 }
-
-import UserHelper._
-
-
-/*
-object Users extends Collection("users", Json.format[User])   {
-
-  import play.api.libs.concurrent.Execution.Implicits._
-
-  collection.indexesManager.ensure( Index( Seq( "companyId" -> IndexType.Hashed ) ) )
-  collection.indexesManager.ensure( Index( Seq( "widgetId" -> IndexType.Hashed ) ) )
-  collection.indexesManager.ensure( Index( Seq( "stats.trackingCookie" -> IndexType.Hashed ) ) )
-
-}
-*/

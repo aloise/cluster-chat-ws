@@ -47,9 +47,11 @@ class CompanyMaster extends Actor {
       companies.get( companyId ).foreach{ case (actor,_) =>
         // actor should kill itself
         actor ! actors.Company.CompanyDeleted( )
-        // actor ! PoisonPill
       }
       companies = companies - companyId
+
+    case GetCompany( companyId ) =>
+      sender ! GetCompanyResponse( companies.get( companyId ) )
 
     case Terminated( actor ) =>
       companies.
@@ -75,7 +77,7 @@ class CompanyMaster extends Actor {
 
         ( actor, company )
       case None =>
-        throw new Exception("Company not found")
+        throw new CompanyNotFoundException(companyId)
     }
 
   }
@@ -110,12 +112,16 @@ class CompanyMaster extends Actor {
 
 object CompanyMaster {
 
+  class CompanyNotFoundException( companyId: ObjId ) extends Exception("Company not found")
+
   case class CompanyMessage( companyId:ObjId, message:Any )
 
   case class DeleteCompany( companyId:ObjId )
 
-//  case class UpdateCompany( company:models.Company )
-
   case class UpdateCompanyData( actor:ActorRef,  company:models.Company )
+
+  case class GetCompany( companyId:ObjId )
+
+  case class GetCompanyResponse( company:Option[(ActorRef, models.Company)] )
 
 }

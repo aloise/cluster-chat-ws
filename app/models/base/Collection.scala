@@ -25,9 +25,8 @@ abstract class Collection[T:ClassTag]( val name:String, fmt:Format[T] ) {
 
   implicit val jsonFormat:OFormat[T] = utils.Json.toOFormat( fmt )
 
-  // lazy val reactiveMongoApi:ReactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
-
-  @Inject() val reactiveMongoApi: ReactiveMongoApi = null
+  // TODO - refactor models - use DI instead
+  lazy val reactiveMongoApi:ReactiveMongoApi = play.api.Play.current.injector.instanceOf[ReactiveMongoApi]
 
   lazy val db = reactiveMongoApi.db
 
