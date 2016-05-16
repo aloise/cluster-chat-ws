@@ -20,7 +20,6 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import scala.util._
 import play.api.libs.json._
-import play.api.Play.current
 import akka.actor.Props
 import scala.concurrent.duration.Duration
 import reactivemongo.play.json._

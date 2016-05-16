@@ -10,7 +10,6 @@ import models.MessageFromTypes.MessageFromType
 import models.{ChatRoomMessage, MessageFromTypes, ChatRoomUserFeedback}
 import models.base.Collection.ObjId
 import play.api.{Play, Logger}
-import play.api.Play.current
 import akka.actor._
 import play.sockjs.api.SockJS
 import play.api.libs.json._

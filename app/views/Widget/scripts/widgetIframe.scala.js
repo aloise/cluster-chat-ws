@@ -1,7 +1,8 @@
 @(
   widgetId:String,
-  widgetConfig:play.api.libs.json.JsObject
-)@layoutIframe(widgetId, widgetConfig) {
+  widgetConfig:play.api.libs.json.JsObject,
+  env:play.api.Environment
+)@layoutIframe(widgetId, widgetConfig, env) {
 
     function IBSBCIframeManager(domPrefix) {
         //this.IBSWidgetIFrame = "." + domPrefix + "-iframe";

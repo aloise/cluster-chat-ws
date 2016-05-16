@@ -1,6 +1,7 @@
 package controllers
 
 import java.util.{GregorianCalendar, Date}
+import javax.inject.Inject
 import javax.xml.datatype.DatatypeFactory
 import controllers.helpers.AssistantAuthAction
 import controllers.helpers.AuthAction._
@@ -16,13 +17,12 @@ import reactivemongo.play.json._
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
 import play.modules.reactivemongo.json.collection._
 import play.api.libs.concurrent.Execution.Implicits._
-import play.api.Play.current
 import play.api.libs.json._
 import scala.concurrent.Future
 import scala.util.Try
 
 
-class Application extends BaseController {
+class Application @Inject() ( implicit conf:Configuration ) extends BaseController {
 
   import helpers.HeaderHelpers._
 

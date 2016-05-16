@@ -10,9 +10,6 @@ import play.api.mvc.Cookie
 import reactivemongo.api.indexes.{IndexType, Index}
 import reactivemongo.bson.BSONObjectID
 import scala.concurrent.Future
-
-import play.api.Play.current
-
 import reactivemongo.play.json._
 import reactivemongo.play.json.BSONFormats.BSONObjectIDFormat
 import play.modules.reactivemongo.json.collection._

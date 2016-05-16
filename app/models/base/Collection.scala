@@ -3,7 +3,8 @@ package models.base
 /**
  * Created by Igor Mordashev <aloise@aloise.name> on 17.10.14.
  */
-import play.api.Play.current
+
+import javax.inject.Inject
 import play.api.libs.json._
 import reactivemongo.api._
 import reactivemongo.play.json.collection
@@ -24,7 +25,9 @@ abstract class Collection[T:ClassTag]( val name:String, fmt:Format[T] ) {
 
   implicit val jsonFormat:OFormat[T] = utils.Json.toOFormat( fmt )
 
-  lazy val reactiveMongoApi:ReactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
+  // lazy val reactiveMongoApi:ReactiveMongoApi = current.injector.instanceOf[ReactiveMongoApi]
+
+  @Inject() val reactiveMongoApi: ReactiveMongoApi = null
 
   lazy val db = reactiveMongoApi.db
 

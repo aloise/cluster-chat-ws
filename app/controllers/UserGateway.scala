@@ -29,8 +29,6 @@ import play.api.mvc._
 import play.api.mvc.Results._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
-import play.api.Play.current
-
 import play.sockjs.api._
 import java.util.Date
 import reactivemongo.api._
@@ -53,6 +51,7 @@ class UserGateway @Inject() ( app: ApplicationLifecycleMonitor, mat:Materializer
   import models.ChatRooms.{ jsonFormat => j1 }
   import models.Assistants.{ jsonFormat => j2 }
 
+  implicit val configuration = app.getConfig
 
   protected val sendOfflineMessageValidator = (
       ( __ \ "name" ).read[String] and

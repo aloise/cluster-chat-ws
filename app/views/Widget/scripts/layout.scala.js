@@ -1,12 +1,11 @@
 @(
   widgetId:String,
-  widgetConfig:play.api.libs.json.JsObject
+  widgetConfig:play.api.libs.json.JsObject,
+  env:play.api.Environment
 )(content: JavaScript)
 @includeScript(filePath:String) = @{
 
-    import play.api.Play.current
-
-    play.api.Play.resourceAsStream(filePath) match {
+    env.resourceAsStream(filePath) match {
         case Some(is) => scala.io.Source.fromInputStream(is).getLines().mkString("\n")
         case _ => ""
     }

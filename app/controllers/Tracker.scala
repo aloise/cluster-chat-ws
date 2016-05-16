@@ -1,5 +1,7 @@
 package controllers
 
+import javax.inject.Inject
+
 import controllers.helpers.HeaderHelpers
 import play.api.mvc.{Action, Controller, RequestHeader}
 import java.net.URLDecoder
@@ -14,8 +16,7 @@ import actors.Company.NewUserJoin
 import actors.messages.SocksMessages._
 import akka.util.Timeout
 import models.base.Collection._
-import play.api.Logger
-import play.api.Play.current
+import play.api.{Configuration, Logger}
 import akka.actor._
 import play.sockjs.api.SockJS
 import play.api.libs.json._
@@ -38,7 +39,7 @@ import controllers.helpers.JsonResponses._
 /**
  * Created by pc3 on 02.12.14.
  */
-class Tracker extends Controller {
+class Tracker @Inject() ( implicit conf:Configuration ) extends Controller {
 
   case class TrackerData(
     trackingCookie:Option[String] = None

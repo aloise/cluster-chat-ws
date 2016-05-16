@@ -39,13 +39,16 @@ import models.Widgets.{jsonFormat => widgetsJsonFormat, TriggerIds}
  * Created by aloise on 17.10.14.
  */
 
-class Widgets @Inject() ( implicit cache:CacheApi ) extends Controller {
+class Widgets @Inject() ( implicit cache:CacheApi, env:play.api.Environment ) extends Controller {
 
   import models.Companies.{ jsonFormat => j0 }
 
+  val additionalHeaders = Seq(
+    "X-UA-Compatible" -> "IE=8",
+    "P3P" -> "CP=\"NON DSP LAW CUR ADM DEV TAI PSA PSD HIS OUR DEL IND UNI PUR COM NAV INT DEM CNT STA POL HEA PRE LOC IVD SAM IVA OTC\""
+  )
+
   def embed( widgetId:String ) = Action.async { request =>
-
-
 
     // get the referer
     val refererOpt = request.getQueryString("refererURL")
@@ -96,7 +99,7 @@ class Widgets @Inject() ( implicit cache:CacheApi ) extends Controller {
         Logger.debug( "Widget Load Error #" + widgetId + " " + ex.getMessage )
         InternalServerError("Widget Load Error")
     } map { response =>
-      response.withHeaders( "X-UA-Compatible" -> "IE=8", "P3P" -> "CP=\"NON DSP LAW CUR ADM DEV TAI PSA PSD HIS OUR DEL IND UNI PUR COM NAV INT DEM CNT STA POL HEA PRE LOC IVD SAM IVA OTC\""  )
+      response.withHeaders( additionalHeaders:_* )
     }
 
 
@@ -176,7 +179,7 @@ class Widgets @Inject() ( implicit cache:CacheApi ) extends Controller {
       "viewTemplates" -> widget.viewTemplates
     )
 
-    views.html.Widget.scripts.widget( widget._id.stringify, widgetConfig )
+    views.html.Widget.scripts.widget( widget._id.stringify, widgetConfig, env )
 
   }
 
@@ -207,7 +210,7 @@ class Widgets @Inject() ( implicit cache:CacheApi ) extends Controller {
       "viewTemplates" -> widget.viewTemplates
     )
 
-    views.js.Widget.scripts.widgetIframe( widget._id.stringify, widgetConfig )
+    views.js.Widget.scripts.widgetIframe( widget._id.stringify, widgetConfig, env )
 
   }
 

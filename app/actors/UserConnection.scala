@@ -14,7 +14,6 @@ import actors.messages.SocksMessages._
 import akka.util.Timeout
 import models.base.Collection._
 import play.api.Logger
-import play.api.Play.current
 import akka.actor._
 import play.sockjs.api.SockJS
 import play.api.libs.json._

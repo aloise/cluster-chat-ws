@@ -5,9 +5,9 @@ package controllers.helpers
  */
 object HeaderHelpers {
 
-  val crossOriginHeaders = Seq[(String,String)](
+  def crossOriginHeadersAllowOrigin( allowOrigin:Option[String] ) = Seq[(String,String)](
     "Access-Control-Allow-Origin" -> "*",
-    "Access-Control-Allow-Origin" -> play.api.Play.current.configuration.getString("assistants.domain").getOrElse("*"),
+    "Access-Control-Allow-Origin" -> allowOrigin.getOrElse("*"),
     "Allow" -> "*",
     "Access-Control-Allow-Methods" -> "POST, GET, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Credentials" -> "true",
@@ -15,5 +15,10 @@ object HeaderHelpers {
     "Access-Control-Allow-Credentials" -> "true"
 
   )
+
+  def crossOriginHeaders()( implicit config:play.api.Configuration ) = {
+    crossOriginHeadersAllowOrigin( config.getString("assistants.domain") )
+
+  }
 
 }

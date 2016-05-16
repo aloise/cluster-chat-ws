@@ -4,7 +4,7 @@ version := "1.0.0"
 
 scalaVersion := "2.11.7"
 
-// lazy val root = (project in file(".")).enablePlugins(PlayScala).settings( autoScalaLibrary := false )
+ lazy val root = (project in file(".")).enablePlugins(PlayScala).settings( autoScalaLibrary := false )
 
 resolvers ++= Seq(
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   cache,
   ws,
   filters,
-  specs2 % Test,
+
   "commons-io" % "commons-io" % "2.4",
   "org.reactivemongo" %% "play2-reactivemongo" % "0.11.11",
   "com.github.fdimuccio" %% "play2-sockjs" % "0.5.0",
@@ -34,7 +34,7 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.4",
 
   "org.specs2" %% "specs2-core" % "3.8" % "test",
-  "com.typesafe.akka" %% "akka-testkit" % "2.4.4" % "test"
-
+  "com.typesafe.akka" %% "akka-testkit" % "2.4.4" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.0" % "test"
 )
 

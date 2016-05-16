@@ -17,11 +17,11 @@ import play.api.libs.concurrent.Execution.Implicits._
 
 class AuthActionClass {
 
-  def withAuth[T]( f: => T => Request[AnyContent] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
-    withAuth[AnyContent,T]( parse.anyContent )( f )( getObject, onUnauthorized )
+  def withAuth[T]( f: => T => Request[AnyContent] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
+    withAuth[AnyContent,T]( parse.anyContent )( f )( getObject, onUnauthorized, conf )
 
 
-  def withAuth[A,T]( bodyParser : BodyParser[A] )( f: => T => Request[A] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
+  def withAuth[A,T]( bodyParser : BodyParser[A] )( f: => T => Request[A] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
     Action.async( bodyParser) { request =>
       getObject( request ) map { obj =>
         f( obj )( request )
@@ -31,13 +31,13 @@ class AuthActionClass {
       } map { _.withHeaders( HeaderHelpers.crossOriginHeaders:_* ) }
     }
 
-  def withAuthJson[T]( f: => T => Request[JsValue] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
-    withAuth[JsValue,T]( parse.json )( f )( getObject, onUnauthorized)
+  def withAuthJson[T]( f: => T => Request[JsValue] => Result )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
+    withAuth[JsValue,T]( parse.json )( f )( getObject, onUnauthorized, conf)
 
-  def withAuthAsync[T]( f: => T => Request[AnyContent] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
-    withAuthAsync[AnyContent,T]( parse.anyContent )( f )( getObject, onUnauthorized )
+  def withAuthAsync[T]( f: => T => Request[AnyContent] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
+    withAuthAsync[AnyContent,T]( parse.anyContent )( f )( getObject, onUnauthorized, conf )
 
-  def withAuthAsync[A,T]( bodyParser: BodyParser[A] )( f: => T => Request[A] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
+  def withAuthAsync[A,T]( bodyParser: BodyParser[A] )( f: => T => Request[A] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
     Action.async(bodyParser) { request =>
       getObject( request ) flatMap { obj =>
         f(obj)(request)
@@ -47,8 +47,8 @@ class AuthActionClass {
       } map { _.withHeaders( HeaderHelpers.crossOriginHeaders:_* ) }
     }
 
-  def withAuthJsonAsync[T]( f: => T => Request[JsValue] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result ):EssentialAction =
-    withAuthAsync[JsValue,T]( parse.json )( f )( getObject, onUnauthorized)
+  def withAuthJsonAsync[T]( f: => T => Request[JsValue] => Future[Result] )( implicit getObject: RequestHeader => Future[T], onUnauthorized: ( Throwable, RequestHeader ) => Result, conf:play.api.Configuration ):EssentialAction =
+    withAuthAsync[JsValue,T]( parse.json )( f )( getObject, onUnauthorized, conf)
 
 
 
