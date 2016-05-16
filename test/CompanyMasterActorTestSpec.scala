@@ -13,7 +13,7 @@ import play.api.test.Helpers._
 import org.scalatest.Matchers._
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
 import play.api.Logger
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorSystem, PoisonPill, Props}
 import com.typesafe.config.ConfigFactory
 import reactivemongo.bson.BSONObjectID
 import akka.pattern._
@@ -68,6 +68,27 @@ class CompanyMasterActorTestSpec extends TestKit(ActorSystem("testActorSystem"))
     "receive a reply with non-empty company" in {
       companyMasterActor ! CompanyMaster.GetCompany( testCompany._id )
       expectMsg( CompanyMaster.GetCompanyResponse( Some( ( testCompanyActor, testCompany ) ) ) )
+
+    }
+
+    "delete company correctly" in {
+
+      val testCompany2 = models.Company( BSONObjectID.generate(), "TestCompany2" )
+
+      val testCompanyActor2 = TestActorRef( Props( classOf[actors.Company], testCompany2, companyMasterActor ) )
+
+      companyMasterActor ! CompanyMaster.UpdateCompanyData( testCompanyActor2, testCompany2 )
+      companyMasterActor ! CompanyMaster.GetCompany( testCompany2._id )
+      expectMsg( CompanyMaster.GetCompanyResponse( Some( ( testCompanyActor2, testCompany2 ) ) ) )
+      companyMasterActor ! CompanyMaster.DeleteCompany( testCompany2._id )
+      companyMasterActor ! CompanyMaster.GetCompany( testCompany2._id )
+      expectMsg( CompanyMaster.GetCompanyResponse( None ) )
+
+    }
+
+    "send message to a company that does not exist" in {
+      companyMasterActor ! CompanyMaster.CompanyMessage( BSONObjectID.generate(), ( BigInt(scala.util.Random.nextInt()), "garbage" ) )
+      expectNoMsg()
 
     }
 
